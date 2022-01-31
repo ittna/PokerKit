@@ -6,3 +6,4 @@ xcuserdata/
 xcshareddata/
 DerivedData/
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+/test-results
