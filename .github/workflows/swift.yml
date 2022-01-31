@@ -1,10 +1,6 @@
 name: Swift
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: pull_request
 
 jobs:
   build:
@@ -18,5 +14,11 @@ jobs:
     - run: git lfs checkout
     - name: Build
       run: swift build -v
+    - run: mkdir test-results
     - name: Run tests
-      run: swift test -v
+      run: swift test -v --xunit-output test-results/test.xml --parallel
+    - name: Publish Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action/composite@v1
+      if: always()
+      with:
+        files: test-results/**/*.xml
