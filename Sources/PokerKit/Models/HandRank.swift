@@ -20,7 +20,7 @@ public enum HandCategory: UInt16 {
 }
 
 public struct HandRank {
-    
+
     public let category: HandCategory
     public let rank: UInt16
 
@@ -32,15 +32,15 @@ public struct HandRank {
         category = cat
         rank = UInt16(value & 0xfff)
     }
-    
+
     private var value: UInt16 {
         return category.rawValue << 12 + rank
     }
-    
+
 }
 
 extension HandRank: Comparable {
-    public static func <(lhs: HandRank, rhs: HandRank) -> Bool {
+    public static func < (lhs: HandRank, rhs: HandRank) -> Bool {
         return lhs.value < rhs.value
     }
 }

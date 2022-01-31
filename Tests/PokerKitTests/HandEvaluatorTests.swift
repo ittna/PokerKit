@@ -2,9 +2,9 @@ import XCTest
 @testable import PokerKit
 
 final class HandEvaluatorTests: XCTestCase {
-    
+
     private let evaluator = PokerKit.lookupTableHandEvaluator()
-    
+
     func testLookupTablePerformance() throws {
         let hands = (1...10000).map { _ in Array(Card.deck.shuffled().prefix(7)) }
         measure(metrics: [XCTClockMetric()]) {
@@ -16,7 +16,7 @@ final class HandEvaluatorTests: XCTestCase {
             }
         }
     }
-    
+
     func testHighCardHands() {
         let h = [Card(rank: Rank.two, suit: Suit.club),
                  Card(rank: Rank.four, suit: Suit.club),
@@ -51,7 +51,7 @@ final class HandEvaluatorTests: XCTestCase {
         XCTAssertEqual(rank7.category, HandCategory.highCard)
         XCTAssertGreaterThan(rank7, rank6)
     }
-    
+
     func testOnePairHands() {
         let h = [Card(rank: Rank.two, suit: Suit.club),
                  Card(rank: Rank.four, suit: Suit.club),
@@ -86,7 +86,7 @@ final class HandEvaluatorTests: XCTestCase {
         XCTAssertEqual(rank7.category, HandCategory.onePair)
         XCTAssertGreaterThan(rank7, rank6)
     }
-    
+
     func testTwoPairHands() {
         let h = [Card(rank: Rank.two, suit: Suit.club),
                  Card(rank: Rank.two, suit: Suit.diamond),
@@ -121,7 +121,7 @@ final class HandEvaluatorTests: XCTestCase {
         XCTAssertEqual(rank7.category, HandCategory.twoPair)
         XCTAssertGreaterThan(rank7, rank6)
     }
-    
+
     func testThreeOfAKindHands() {
         let h = [Card(rank: Rank.two, suit: Suit.club),
                  Card(rank: Rank.two, suit: Suit.diamond),
@@ -156,7 +156,7 @@ final class HandEvaluatorTests: XCTestCase {
         XCTAssertEqual(rank7.category, HandCategory.threeOfAKind)
         XCTAssertGreaterThan(rank7, rank6)
     }
-    
+
     func testStraightHands() {
         let h = [Card(rank: Rank.ace, suit: Suit.club),
                  Card(rank: Rank.two, suit: Suit.club),
@@ -191,7 +191,7 @@ final class HandEvaluatorTests: XCTestCase {
         XCTAssertEqual(rank7.category, HandCategory.straight)
         XCTAssertGreaterThan(rank7, rank6)
     }
-    
+
     func testFlushHands() {
         let h = [Card(rank: Rank.two, suit: Suit.spade),
                  Card(rank: Rank.four, suit: Suit.spade),
@@ -226,7 +226,7 @@ final class HandEvaluatorTests: XCTestCase {
         XCTAssertEqual(rank7.category, HandCategory.flush)
         XCTAssertGreaterThan(rank7, rank6)
     }
-    
+
     func testFullHouseHands() {
         let h = [Card(rank: Rank.two, suit: Suit.club),
                  Card(rank: Rank.two, suit: Suit.diamond),
@@ -261,7 +261,7 @@ final class HandEvaluatorTests: XCTestCase {
         XCTAssertEqual(rank7.category, HandCategory.fullHouse)
         XCTAssertGreaterThan(rank7, rank6)
     }
-    
+
     func testFourOfAKindHands() {
         let h = [Card(rank: Rank.two, suit: Suit.club),
                  Card(rank: Rank.two, suit: Suit.diamond),
@@ -296,7 +296,7 @@ final class HandEvaluatorTests: XCTestCase {
         XCTAssertEqual(rank7.category, HandCategory.fourOfAKind)
         XCTAssertGreaterThan(rank7, rank6)
     }
-    
+
     func testStraightFlushHands() {
         let h = [Card(rank: Rank.eight, suit: Suit.club),
                  Card(rank: Rank.nine, suit: Suit.club),

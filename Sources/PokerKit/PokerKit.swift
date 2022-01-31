@@ -8,9 +8,9 @@
 import Foundation
 
 public enum PokerKit {
-    
+
     public static func lookupTableHandEvaluator() -> HandEvaluator {
         return LookupTableHandEvaluator()
     }
-    
+
 }
