@@ -7,7 +7,7 @@ public enum Suit: Int, CaseIterable {
     case spade = 3
 }
 
-extension Suit : CustomStringConvertible {
+extension Suit: CustomStringConvertible {
     public var description: String {
         return ["♣", "♦", "♥", "♠"][rawValue]
     }

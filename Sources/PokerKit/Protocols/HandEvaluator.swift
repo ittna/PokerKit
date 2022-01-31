@@ -8,8 +8,8 @@
 import Foundation
 
 public protocol HandEvaluator {
-    
+
     func evaluate(card: Card, handle: HandHandle) -> HandHandle
     func evaluate(handle: HandHandle) -> HandRank?
-    
+
 }

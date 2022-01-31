@@ -8,12 +8,12 @@
 import Foundation
 
 public struct HandHandle {
-    
+
     let value: Int
     let hand: [Card]
-    
+
     static var empty: HandHandle {
         return HandHandle(value: 53, hand: [])
     }
-    
+
 }

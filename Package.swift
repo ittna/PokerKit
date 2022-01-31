@@ -9,7 +9,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "PokerKit",
-            targets: ["PokerKit"]),
+            targets: ["PokerKit"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -24,6 +24,6 @@ let package = Package(
             resources: [.copy("Resources")]),
         .testTarget(
             name: "PokerKitTests",
-            dependencies: ["PokerKit"]),
+            dependencies: ["PokerKit"])
     ]
 )
