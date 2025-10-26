@@ -5,10 +5,10 @@ on: pull_request
 jobs:
   build:
 
-    runs-on: macos-latest
+    runs-on: macos-26
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
       with:
         lfs: true
     - run: git lfs checkout
@@ -18,7 +18,7 @@ jobs:
     - name: Run tests
       run: swift test -v --xunit-output test-results/test.xml --parallel
     - name: Publish Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action/composite@v1
+      uses: EnricoMi/publish-unit-test-result-action/macos@v2
       if: always()
       with:
         files: test-results/**/*.xml
