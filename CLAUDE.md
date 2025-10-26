@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-PokerKit is a Swift package for poker hand evaluation. It uses a lookup table-based algorithm with a large binary data file (HandRanks.dat, ~130MB) to efficiently evaluate poker hands.
+PokerKit is a Swift package for poker hand evaluation and equity calculation. It uses a lookup table-based algorithm with a large binary data file (HandRanks.dat, ~130MB) to efficiently evaluate poker hands and calculate hand equity against multiple opponents.
 
 ## Common Commands
 
@@ -50,14 +50,26 @@ The package uses a **Protocol-Oriented Design** with the `HandEvaluator` protoco
    - Supports 5, 6, and 7 card hands
    - Uses `HandHandle` for incremental card-by-card evaluation
 
-3. **Models**
+3. **EquityCalculator Protocol** (`Protocols/EquityCalculator.swift`)
+   - Defines the interface for equity calculation strategies
+   - Two methods: `calculateEquity(hand:board:numOpponents:)` for unknown opponents and `calculateEquity(hand:board:opponentHands:)` for known opponent hands
+
+4. **DefaultEquityCalculator** (`Implementation/DefaultEquityCalculator.swift`)
+   - Concrete implementation using combinatorial analysis and Monte Carlo simulation
+   - Uses the HandEvaluator to evaluate all possible outcomes
+   - Switches to Monte Carlo (1M iterations) when combinations exceed 1M
+   - Handles incomplete boards (0-5 community cards)
+   - Requires swift-algorithms package for efficient combination generation
+
+5. **Models**
    - `Card`: Represents a playing card with `rank` and `suit`, has an `id` computed property used for lookup table indexing
    - `HandHandle`: Tracks evaluation state as cards are added incrementally (contains `value` for lookup and `hand` array)
    - `HandRank`: Final evaluation result with `category` (high card, pair, etc.) and `rank` for comparison
    - `Rank` and `Suit`: Standard playing card enumerations
 
-4. **Factory Pattern** (`PokerKit.swift`)
+6. **Factory Pattern** (`PokerKit.swift`)
    - `PokerKit.lookupTableHandEvaluator()` provides the standard evaluator instance
+   - `PokerKit.defaultEquityCalculator(evaluator:)` provides the equity calculator (defaults to using lookup table evaluator)
 
 ### How Hand Evaluation Works
 
@@ -67,6 +79,32 @@ The package uses a **Protocol-Oriented Design** with the `HandEvaluator` protoco
    - Returns a new `HandHandle` with updated value and hand array
 3. After 5-7 cards, call `evaluator.evaluate(handle:)` to get the final `HandRank`
 4. HandRank encodes both category (hand type) and rank (strength within category) in a single value for comparison
+
+### How Equity Calculation Works
+
+1. **Unknown Opponents Mode** (`calculateEquity(hand:board:numOpponents:)`):
+   - Builds a deck excluding known cards (hero's hand + board)
+   - Generates all possible combinations of remaining cards for board completion and opponent hands
+   - For each combination, evaluates hero's hand vs opponent hands
+   - Switches to Monte Carlo sampling if combinations exceed 1M
+
+2. **Known Opponents Mode** (`calculateEquity(hand:board:opponentHands:)`):
+   - Used when opponent hands are known (e.g., all-in showdown situations)
+   - Builds a deck excluding all known cards
+   - If board is incomplete, enumerates all possible board completions
+   - For each board completion, compares hero's hand rank against opponent hand ranks
+   - Returns exact equity (0.0 for loss, 1.0 for win, 0.5 for chop in heads-up, 1/n for n-way chop)
+
+3. **Monte Carlo Simulation**:
+   - Triggered when total combinations exceed 1,000,000 (defined by `maxCombinationsCount`)
+   - Randomly samples 1M scenarios instead of exhaustive enumeration
+   - Provides fast approximation for complex scenarios (e.g., preflop multiway with many opponents)
+
+4. **Equity Calculation Details**:
+   - Equity is calculated as the probability of winning or chopping
+   - For a win, equity = 1.0 divided by the number of players with the same best hand rank
+   - Uses HandEvaluator to rank all hands and determine winners
+   - Properly handles chops (multiple players with identical hand ranks)
 
 ### Resources and Git LFS
 
@@ -79,6 +117,8 @@ The `HandRanks.dat` file is tracked with Git LFS due to its size. CI/CD workflow
 - Uses StrictConcurrency experimental feature
 - Resources are copied (not processed) to support Bundle.module access
 - SwiftLint disabled rule: `identifier_name`
+- Dependencies:
+  - swift-algorithms: Used for efficient combination generation in equity calculations
 
 ## Testing Framework
 
@@ -87,3 +127,7 @@ Uses Swift Testing (not XCTest). Key patterns:
 - `@Test` for individual tests
 - `#expect` for assertions
 - `#require` for non-optional unwrapping in tests
+
+Test suites include:
+- `HandEvaluatorTests`: Tests for all hand categories and edge cases
+- `EquityCalculatorTests`: Tests for equity calculation with known/unknown opponents, complete/incomplete boards, and various hand matchups
