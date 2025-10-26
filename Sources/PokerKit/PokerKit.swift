@@ -12,5 +12,9 @@ public enum PokerKit {
     public static func lookupTableHandEvaluator() -> HandEvaluator {
         return LookupTableHandEvaluator()
     }
+    
+    public static func defaultEquityCalculator(evaluator: HandEvaluator = lookupTableHandEvaluator()) -> EquityCalculator {
+        return DefaultEquityCalculator(evaluator: evaluator)
+    }
 
 }

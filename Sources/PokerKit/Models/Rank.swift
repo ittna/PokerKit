@@ -19,7 +19,7 @@ public enum Rank: UInt8, CaseIterable {
 extension Rank: CustomStringConvertible {
     public var description: String {
         if rawValue < 8 {
-            return String(rawValue)
+            return String(rawValue + 2)
         } else {
             return ["T", "J", "Q", "K", "A"][Int(rawValue - 8)]
         }

@@ -19,7 +19,7 @@ public enum HandCategory: UInt16 {
     case straightFlush = 9
 }
 
-public struct HandRank {
+public struct HandRank: Equatable {
 
     public let category: HandCategory
     public let rank: UInt16
