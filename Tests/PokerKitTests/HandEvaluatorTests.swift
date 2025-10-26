@@ -1,23 +1,13 @@
-import XCTest
+import Testing
 @testable import PokerKit
 
-final class HandEvaluatorTests: XCTestCase {
+@Suite("Hand Evaluator Tests")
+struct HandEvaluatorTests {
 
     private let evaluator = PokerKit.lookupTableHandEvaluator()
 
-    func testLookupTablePerformance() throws {
-        let hands = (1...10000).map { _ in Array(Card.deck.shuffled().prefix(7)) }
-        measure(metrics: [XCTClockMetric()]) {
-            for hand in hands {
-                var handle: HandHandle = .empty
-                for c in hand {
-                    handle = evaluator.evaluate(card: c, handle: handle)
-                }
-            }
-        }
-    }
-
-    func testHighCardHands() {
+    @Test("High Card Hands")
+    func highCardHands() throws {
         let h = [Card(rank: Rank.two, suit: Suit.club),
                  Card(rank: Rank.four, suit: Suit.club),
                  Card(rank: Rank.six, suit: Suit.diamond),
@@ -31,28 +21,22 @@ final class HandEvaluatorTests: XCTestCase {
         handle = evaluator.evaluate(card: h[2], handle: handle)
         handle = evaluator.evaluate(card: h[3], handle: handle)
         handle = evaluator.evaluate(card: h[4], handle: handle)
-        guard let rank5 = evaluator.evaluate(handle: handle) else {
-            XCTFail("5 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank5.category, HandCategory.highCard)
+        let rank5 = try #require(evaluator.evaluate(handle: handle), "5 card hand should have rank")
+        #expect(rank5.category == HandCategory.highCard)
+        
         handle = evaluator.evaluate(card: h[5], handle: handle)
-        guard let rank6 = evaluator.evaluate(handle: handle) else {
-            XCTFail("6 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank6.category, HandCategory.highCard)
-        XCTAssertGreaterThan(rank6, rank5)
+        let rank6 = try #require(evaluator.evaluate(handle: handle), "6 card hand should have rank")
+        #expect(rank6.category == HandCategory.highCard)
+        #expect(rank6 > rank5)
+        
         handle = evaluator.evaluate(card: h[6], handle: handle)
-        guard let rank7 = evaluator.evaluate(handle: handle) else {
-            XCTFail("7 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank7.category, HandCategory.highCard)
-        XCTAssertGreaterThan(rank7, rank6)
+        let rank7 = try #require(evaluator.evaluate(handle: handle), "7 card hand should have rank")
+        #expect(rank7.category == HandCategory.highCard)
+        #expect(rank7 > rank6)
     }
 
-    func testOnePairHands() {
+    @Test("One Pair Hands")
+    func onePairHands() throws {
         let h = [Card(rank: Rank.two, suit: Suit.club),
                  Card(rank: Rank.four, suit: Suit.club),
                  Card(rank: Rank.six, suit: Suit.diamond),
@@ -66,28 +50,22 @@ final class HandEvaluatorTests: XCTestCase {
         handle = evaluator.evaluate(card: h[2], handle: handle)
         handle = evaluator.evaluate(card: h[3], handle: handle)
         handle = evaluator.evaluate(card: h[4], handle: handle)
-        guard let rank5 = evaluator.evaluate(handle: handle) else {
-            XCTFail("5 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank5.category, HandCategory.onePair)
+        let rank5 = try #require(evaluator.evaluate(handle: handle), "5 card hand should have rank")
+        #expect(rank5.category == HandCategory.onePair)
+        
         handle = evaluator.evaluate(card: h[5], handle: handle)
-        guard let rank6 = evaluator.evaluate(handle: handle) else {
-            XCTFail("6 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank6.category, HandCategory.onePair)
-        XCTAssertGreaterThan(rank6, rank5)
+        let rank6 = try #require(evaluator.evaluate(handle: handle), "6 card hand should have rank")
+        #expect(rank6.category == HandCategory.onePair)
+        #expect(rank6 > rank5)
+        
         handle = evaluator.evaluate(card: h[6], handle: handle)
-        guard let rank7 = evaluator.evaluate(handle: handle) else {
-            XCTFail("7 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank7.category, HandCategory.onePair)
-        XCTAssertGreaterThan(rank7, rank6)
+        let rank7 = try #require(evaluator.evaluate(handle: handle), "7 card hand should have rank")
+        #expect(rank7.category == HandCategory.onePair)
+        #expect(rank7 > rank6)
     }
 
-    func testTwoPairHands() {
+    @Test("Two Pair Hands")
+    func twoPairHands() throws {
         let h = [Card(rank: Rank.two, suit: Suit.club),
                  Card(rank: Rank.two, suit: Suit.diamond),
                  Card(rank: Rank.queen, suit: Suit.diamond),
@@ -101,28 +79,22 @@ final class HandEvaluatorTests: XCTestCase {
         handle = evaluator.evaluate(card: h[2], handle: handle)
         handle = evaluator.evaluate(card: h[3], handle: handle)
         handle = evaluator.evaluate(card: h[4], handle: handle)
-        guard let rank5 = evaluator.evaluate(handle: handle) else {
-            XCTFail("5 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank5.category, HandCategory.twoPair)
+        let rank5 = try #require(evaluator.evaluate(handle: handle), "5 card hand should have rank")
+        #expect(rank5.category == HandCategory.twoPair)
+        
         handle = evaluator.evaluate(card: h[5], handle: handle)
-        guard let rank6 = evaluator.evaluate(handle: handle) else {
-            XCTFail("6 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank6.category, HandCategory.twoPair)
-        XCTAssertGreaterThan(rank6, rank5)
+        let rank6 = try #require(evaluator.evaluate(handle: handle), "6 card hand should have rank")
+        #expect(rank6.category == HandCategory.twoPair)
+        #expect(rank6 > rank5)
+        
         handle = evaluator.evaluate(card: h[6], handle: handle)
-        guard let rank7 = evaluator.evaluate(handle: handle) else {
-            XCTFail("7 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank7.category, HandCategory.twoPair)
-        XCTAssertGreaterThan(rank7, rank6)
+        let rank7 = try #require(evaluator.evaluate(handle: handle), "7 card hand should have rank")
+        #expect(rank7.category == HandCategory.twoPair)
+        #expect(rank7 > rank6)
     }
 
-    func testThreeOfAKindHands() {
+    @Test("Three of a Kind Hands")
+    func threeOfAKindHands() throws {
         let h = [Card(rank: Rank.two, suit: Suit.club),
                  Card(rank: Rank.two, suit: Suit.diamond),
                  Card(rank: Rank.two, suit: Suit.heart),
@@ -136,28 +108,22 @@ final class HandEvaluatorTests: XCTestCase {
         handle = evaluator.evaluate(card: h[2], handle: handle)
         handle = evaluator.evaluate(card: h[3], handle: handle)
         handle = evaluator.evaluate(card: h[4], handle: handle)
-        guard let rank5 = evaluator.evaluate(handle: handle) else {
-            XCTFail("5 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank5.category, HandCategory.threeOfAKind)
+        let rank5 = try #require(evaluator.evaluate(handle: handle), "5 card hand should have rank")
+        #expect(rank5.category == HandCategory.threeOfAKind)
+        
         handle = evaluator.evaluate(card: h[5], handle: handle)
-        guard let rank6 = evaluator.evaluate(handle: handle) else {
-            XCTFail("6 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank6.category, HandCategory.threeOfAKind)
-        XCTAssertGreaterThan(rank6, rank5)
+        let rank6 = try #require(evaluator.evaluate(handle: handle), "6 card hand should have rank")
+        #expect(rank6.category == HandCategory.threeOfAKind)
+        #expect(rank6 > rank5)
+        
         handle = evaluator.evaluate(card: h[6], handle: handle)
-        guard let rank7 = evaluator.evaluate(handle: handle) else {
-            XCTFail("7 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank7.category, HandCategory.threeOfAKind)
-        XCTAssertGreaterThan(rank7, rank6)
+        let rank7 = try #require(evaluator.evaluate(handle: handle), "7 card hand should have rank")
+        #expect(rank7.category == HandCategory.threeOfAKind)
+        #expect(rank7 > rank6)
     }
 
-    func testStraightHands() {
+    @Test("Straight Hands")
+    func straightHands() throws {
         let h = [Card(rank: Rank.ace, suit: Suit.club),
                  Card(rank: Rank.two, suit: Suit.club),
                  Card(rank: Rank.three, suit: Suit.diamond),
@@ -171,28 +137,22 @@ final class HandEvaluatorTests: XCTestCase {
         handle = evaluator.evaluate(card: h[2], handle: handle)
         handle = evaluator.evaluate(card: h[3], handle: handle)
         handle = evaluator.evaluate(card: h[4], handle: handle)
-        guard let rank5 = evaluator.evaluate(handle: handle) else {
-            XCTFail("5 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank5.category, HandCategory.straight)
+        let rank5 = try #require(evaluator.evaluate(handle: handle), "5 card hand should have rank")
+        #expect(rank5.category == HandCategory.straight)
+        
         handle = evaluator.evaluate(card: h[5], handle: handle)
-        guard let rank6 = evaluator.evaluate(handle: handle) else {
-            XCTFail("6 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank6.category, HandCategory.straight)
-        XCTAssertGreaterThan(rank6, rank5)
+        let rank6 = try #require(evaluator.evaluate(handle: handle), "6 card hand should have rank")
+        #expect(rank6.category == HandCategory.straight)
+        #expect(rank6 > rank5)
+        
         handle = evaluator.evaluate(card: h[6], handle: handle)
-        guard let rank7 = evaluator.evaluate(handle: handle) else {
-            XCTFail("7 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank7.category, HandCategory.straight)
-        XCTAssertGreaterThan(rank7, rank6)
+        let rank7 = try #require(evaluator.evaluate(handle: handle), "7 card hand should have rank")
+        #expect(rank7.category == HandCategory.straight)
+        #expect(rank7 > rank6)
     }
 
-    func testFlushHands() {
+    @Test("Flush Hands")
+    func flushHands() throws {
         let h = [Card(rank: Rank.two, suit: Suit.spade),
                  Card(rank: Rank.four, suit: Suit.spade),
                  Card(rank: Rank.six, suit: Suit.spade),
@@ -206,28 +166,22 @@ final class HandEvaluatorTests: XCTestCase {
         handle = evaluator.evaluate(card: h[2], handle: handle)
         handle = evaluator.evaluate(card: h[3], handle: handle)
         handle = evaluator.evaluate(card: h[4], handle: handle)
-        guard let rank5 = evaluator.evaluate(handle: handle) else {
-            XCTFail("5 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank5.category, HandCategory.flush)
+        let rank5 = try #require(evaluator.evaluate(handle: handle), "5 card hand should have rank")
+        #expect(rank5.category == HandCategory.flush)
+        
         handle = evaluator.evaluate(card: h[5], handle: handle)
-        guard let rank6 = evaluator.evaluate(handle: handle) else {
-            XCTFail("6 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank6.category, HandCategory.flush)
-        XCTAssertGreaterThan(rank6, rank5)
+        let rank6 = try #require(evaluator.evaluate(handle: handle), "6 card hand should have rank")
+        #expect(rank6.category == HandCategory.flush)
+        #expect(rank6 > rank5)
+        
         handle = evaluator.evaluate(card: h[6], handle: handle)
-        guard let rank7 = evaluator.evaluate(handle: handle) else {
-            XCTFail("7 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank7.category, HandCategory.flush)
-        XCTAssertGreaterThan(rank7, rank6)
+        let rank7 = try #require(evaluator.evaluate(handle: handle), "7 card hand should have rank")
+        #expect(rank7.category == HandCategory.flush)
+        #expect(rank7 > rank6)
     }
 
-    func testFullHouseHands() {
+    @Test("Full House Hands")
+    func fullHouseHands() throws {
         let h = [Card(rank: Rank.two, suit: Suit.club),
                  Card(rank: Rank.two, suit: Suit.diamond),
                  Card(rank: Rank.eight, suit: Suit.heart),
@@ -241,28 +195,22 @@ final class HandEvaluatorTests: XCTestCase {
         handle = evaluator.evaluate(card: h[2], handle: handle)
         handle = evaluator.evaluate(card: h[3], handle: handle)
         handle = evaluator.evaluate(card: h[4], handle: handle)
-        guard let rank5 = evaluator.evaluate(handle: handle) else {
-            XCTFail("5 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank5.category, HandCategory.twoPair)
+        let rank5 = try #require(evaluator.evaluate(handle: handle), "5 card hand should have rank")
+        #expect(rank5.category == HandCategory.twoPair)
+        
         handle = evaluator.evaluate(card: h[5], handle: handle)
-        guard let rank6 = evaluator.evaluate(handle: handle) else {
-            XCTFail("6 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank6.category, HandCategory.fullHouse)
-        XCTAssertGreaterThan(rank6, rank5)
+        let rank6 = try #require(evaluator.evaluate(handle: handle), "6 card hand should have rank")
+        #expect(rank6.category == HandCategory.fullHouse)
+        #expect(rank6 > rank5)
+        
         handle = evaluator.evaluate(card: h[6], handle: handle)
-        guard let rank7 = evaluator.evaluate(handle: handle) else {
-            XCTFail("7 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank7.category, HandCategory.fullHouse)
-        XCTAssertGreaterThan(rank7, rank6)
+        let rank7 = try #require(evaluator.evaluate(handle: handle), "7 card hand should have rank")
+        #expect(rank7.category == HandCategory.fullHouse)
+        #expect(rank7 > rank6)
     }
 
-    func testFourOfAKindHands() {
+    @Test("Four of a Kind Hands")
+    func fourOfAKindHands() throws {
         let h = [Card(rank: Rank.two, suit: Suit.club),
                  Card(rank: Rank.two, suit: Suit.diamond),
                  Card(rank: Rank.two, suit: Suit.heart),
@@ -276,28 +224,22 @@ final class HandEvaluatorTests: XCTestCase {
         handle = evaluator.evaluate(card: h[2], handle: handle)
         handle = evaluator.evaluate(card: h[3], handle: handle)
         handle = evaluator.evaluate(card: h[4], handle: handle)
-        guard let rank5 = evaluator.evaluate(handle: handle) else {
-            XCTFail("5 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank5.category, HandCategory.fourOfAKind)
+        let rank5 = try #require(evaluator.evaluate(handle: handle), "5 card hand should have rank")
+        #expect(rank5.category == HandCategory.fourOfAKind)
+        
         handle = evaluator.evaluate(card: h[5], handle: handle)
-        guard let rank6 = evaluator.evaluate(handle: handle) else {
-            XCTFail("6 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank6.category, HandCategory.fourOfAKind)
-        XCTAssertGreaterThan(rank6, rank5)
+        let rank6 = try #require(evaluator.evaluate(handle: handle), "6 card hand should have rank")
+        #expect(rank6.category == HandCategory.fourOfAKind)
+        #expect(rank6 > rank5)
+        
         handle = evaluator.evaluate(card: h[6], handle: handle)
-        guard let rank7 = evaluator.evaluate(handle: handle) else {
-            XCTFail("7 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank7.category, HandCategory.fourOfAKind)
-        XCTAssertGreaterThan(rank7, rank6)
+        let rank7 = try #require(evaluator.evaluate(handle: handle), "7 card hand should have rank")
+        #expect(rank7.category == HandCategory.fourOfAKind)
+        #expect(rank7 > rank6)
     }
 
-    func testStraightFlushHands() {
+    @Test("Straight Flush Hands")
+    func straightFlushHands() throws {
         let h = [Card(rank: Rank.eight, suit: Suit.club),
                  Card(rank: Rank.nine, suit: Suit.club),
                  Card(rank: Rank.ten, suit: Suit.club),
@@ -311,24 +253,17 @@ final class HandEvaluatorTests: XCTestCase {
         handle = evaluator.evaluate(card: h[2], handle: handle)
         handle = evaluator.evaluate(card: h[3], handle: handle)
         handle = evaluator.evaluate(card: h[4], handle: handle)
-        guard let rank5 = evaluator.evaluate(handle: handle) else {
-            XCTFail("5 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank5.category, HandCategory.straightFlush)
+        let rank5 = try #require(evaluator.evaluate(handle: handle), "5 card hand should have rank")
+        #expect(rank5.category == HandCategory.straightFlush)
+        
         handle = evaluator.evaluate(card: h[5], handle: handle)
-        guard let rank6 = evaluator.evaluate(handle: handle) else {
-            XCTFail("6 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank6.category, HandCategory.straightFlush)
-        XCTAssertGreaterThan(rank6, rank5)
+        let rank6 = try #require(evaluator.evaluate(handle: handle), "6 card hand should have rank")
+        #expect(rank6.category == HandCategory.straightFlush)
+        #expect(rank6 > rank5)
+        
         handle = evaluator.evaluate(card: h[6], handle: handle)
-        guard let rank7 = evaluator.evaluate(handle: handle) else {
-            XCTFail("7 card hand should have rank")
-            return
-        }
-        XCTAssertEqual(rank7.category, HandCategory.straightFlush)
-        XCTAssertGreaterThan(rank7, rank6)
+        let rank7 = try #require(evaluator.evaluate(handle: handle), "7 card hand should have rank")
+        #expect(rank7.category == HandCategory.straightFlush)
+        #expect(rank7 > rank6)
     }
 }
