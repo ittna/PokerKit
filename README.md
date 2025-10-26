@@ -106,6 +106,37 @@ let equity = calculator.calculateEquity(
 print("Equity: \(equity * 100)%")  // e.g., "100%" for a royal flush
 ```
 
+#### Equity Against Known Opponent Hands
+
+When opponent hands are known (e.g., in all-in situations), you can calculate exact equity:
+
+```swift
+// All-in situation: you have AA, opponent has KK
+let hand = [
+    Card(rank: .ace, suit: .clubs),
+    Card(rank: .ace, suit: .hearts)
+]
+
+let opponentHands = [
+    [Card(rank: .king, suit: .clubs), Card(rank: .king, suit: .hearts)]
+]
+
+let board = []  // Preflop all-in
+
+let equity = calculator.calculateEquity(
+    hand: hand,
+    board: board,
+    opponentHands: opponentHands
+)
+
+print("Equity: \(equity * 100)%")  // ~82% for AA vs KK
+```
+
+This method also works with:
+- Multiple known opponents
+- Incomplete boards (automatically enumerates all runouts)
+- Complete boards (instant calculation)
+
 #### Equity Calculation Examples
 
 ```swift
@@ -176,9 +207,23 @@ if rank1 > rank2 {
 
 ### Equity Calculation
 
-- **Exhaustive Analysis**: For smaller scenarios, calculates exact equity by evaluating all possible card combinations
-- **Monte Carlo Simulation**: For larger scenarios (>1M combinations), uses Monte Carlo sampling with 1 million iterations for fast approximation
+The equity calculator supports two modes:
+
+1. **Unknown Opponents** (`calculateEquity(hand:board:numOpponents:)`):
+   - Calculates equity against a specified number of random opponent hands
+   - Exhaustively evaluates all possible combinations for smaller scenarios
+   - Switches to Monte Carlo simulation (1M iterations) when combinations exceed 1 million
+
+2. **Known Opponents** (`calculateEquity(hand:board:opponentHands:)`):
+   - Calculates exact equity when opponent hands are known
+   - Useful for all-in situations or hand range analysis
+   - Handles incomplete boards by enumerating all possible runouts
+   - Instant calculation for complete boards
+
+Implementation details:
 - Uses the swift-algorithms package for efficient combination generation
+- Monte Carlo threshold: 1,000,000 combinations
+- Properly handles chops (split pots) by dividing equity among winners
 
 ## Architecture
 
@@ -186,8 +231,8 @@ PokerKit uses a protocol-oriented design:
 
 - `HandEvaluator` protocol: Interface for hand evaluation strategies
 - `LookupTableHandEvaluator`: Concrete implementation using a pre-computed lookup table
-- `EquityCalculator` protocol: Interface for equity calculation
-- `DefaultEquityCalculator`: Implementation supporting both combinatorial and Monte Carlo methods
+- `EquityCalculator` protocol: Interface for equity calculation with two calculation modes
+- `DefaultEquityCalculator`: Implementation supporting both exhaustive enumeration and Monte Carlo simulation
 
 ## Resources
 

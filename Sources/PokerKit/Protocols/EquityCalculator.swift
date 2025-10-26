@@ -9,4 +9,5 @@ import Foundation
 
 public protocol EquityCalculator {
     func calculateEquity(hand: [Card], board: [Card], numOpponents: Int) -> Double
+    func calculateEquity(hand: [Card], board: [Card], opponentHands: [[Card]]) -> Double
 }
