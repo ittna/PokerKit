@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Card {
+public struct Card: Equatable, Hashable {
     public let rank: Rank
     public let suit: Suit
 
